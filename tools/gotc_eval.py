@@ -115,6 +115,10 @@ def make_synthetic_embeddings(n: int, dim: int, hub_ratio: float, noise_rate: fl
 
 def load_embeddings(args: argparse.Namespace, noise_rate: float, seed: int) -> tuple[np.ndarray, np.ndarray]:
     if args.image_emb_path and args.text_emb_path:
+        if not args.image_emb_path.exists():
+            raise FileNotFoundError(f"image embedding file not found: {args.image_emb_path}")
+        if not args.text_emb_path.exists():
+            raise FileNotFoundError(f"text embedding file not found: {args.text_emb_path}")
         img = np.load(args.image_emb_path)
         txt = np.load(args.text_emb_path)
         if img.ndim != 2 or txt.ndim != 2:
@@ -218,8 +222,8 @@ def parse_args(argv: Iterable[str] | None = None) -> argparse.Namespace:
     p.add_argument("--alpha", type=float, default=0.9)
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--repeats", type=int, default=1, help="repeat runs with different seeds and report mean")
-    p.add_argument("--image_emb_path", type=Path, default=None)
-    p.add_argument("--text_emb_path", type=Path, default=None)
+    p.add_argument("--image_emb_path", "--img_emb_path", dest="image_emb_path", type=Path, default=None)
+    p.add_argument("--text_emb_path", "--txt_emb_path", dest="text_emb_path", type=Path, default=None)
     p.add_argument("--report_path", type=Path, default=Path("report_gotc.md"))
     return p.parse_args(argv)
 
